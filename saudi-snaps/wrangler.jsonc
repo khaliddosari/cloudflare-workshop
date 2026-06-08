@@ -4,21 +4,14 @@
   "main": "src/index.js",
   "compatibility_date": "2026-05-30",
   "observability": { "enabled": true },
-  "assets": {
-    "directory": "./public/",
-    "binding": "ASSETS"
-  },
-  "kv_namespaces": [
-    {
-      "binding": "workshop_kv",
-      "id": "06e75245c96f47a2860774d16170bc8f"
-    }
+  "assets": { "directory": "./public/", "binding": "ASSETS" },
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "saudi-snaps-photos" }
   ],
   "d1_databases": [
-    {
-      "binding": "cloudflare_workshop",
-      "database_name": "cloudflare-workshop",
-      "database_id": "565e033c-9538-42c7-9690-88efc6974162"
-    }
+    { "binding": "DB", "database_name": "cloudflare-workshop", "database_id": "565e033c-9538-42c7-9690-88efc6974162" }
+  ],
+  "kv_namespaces": [
+    { "binding": "RATE_LIMIT", "id": "06e75245c96f47a2860774d16170bc8f" }
   ]
 }

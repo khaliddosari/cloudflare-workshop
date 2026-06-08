@@ -5,21 +5,153 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Saudi Snaps</title>
   <style>
-    body { font-family: sans-serif; background: #0f172a; color: #e2e8f0;
-           display: flex; align-items: center; justify-content: center;
-           min-height: 100vh; margin: 0; }
-    .card { background: #1e293b; border-radius: 12px; padding: 2rem; text-align: center; }
-    h1 { color: #f97316; margin-bottom: 0.5rem; }
-    p  { color: #94a3b8; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 1.5rem; }
+    .logo { font-size: 2rem; font-weight: 800; color: #f97316; }
+    .tagline { color: #94a3b8; font-size: 0.9rem; margin-top: 0.25rem; }
+    .stats-bar { display: flex; gap: 0.75rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+    .stat { flex: 1; min-width: 130px; background: #1e293b; border: 1px solid #334155;
+            border-radius: 10px; padding: 0.9rem 1rem; text-align: center; }
+    .stat .val { font-size: 1.4rem; font-weight: 700; color: #f97316; }
+    .stat .lbl { font-size: 0.7rem; color: #64748b; margin-top: 0.2rem;
+                 text-transform: uppercase; letter-spacing: 0.05em; }
+    .uploader { background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+                padding: 1.5rem; margin-bottom: 1.75rem; }
+    .uploader h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #f1f5f9; }
+    input[type=text], input[type=file] { width: 100%; background: #0f172a;
+      border: 1px solid #334155; border-radius: 8px; color: #e2e8f0;
+      padding: 0.6rem 0.75rem; font-size: 0.9rem; margin-bottom: 0.75rem; }
+    input[type=file] { padding: 0.45rem 0.75rem; color: #94a3b8; }
+    button.post-btn { width: 100%; background: #f97316; color: #fff; border: none;
+      border-radius: 8px; padding: 0.75rem; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    button.post-btn:disabled { background: #475569; cursor: not-allowed; }
+    .result { margin-top: 1rem; background: #0f172a; border: 1px solid #334155;
+              border-radius: 8px; padding: 1rem; display: none; }
+    .result .caption-text { font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; margin-bottom: 0.75rem; }
+    .metrics { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .chip { display: inline-flex; align-items: center; gap: 0.3rem; background: #1e293b;
+            border: 1px solid #334155; border-radius: 999px; padding: 3px 10px;
+            font-size: 0.75rem; color: #94a3b8; }
+    .chip.highlight { border-color: #f97316; color: #f97316; }
+    .chip.hit  { border-color: #4ade80; color: #4ade80; }
+    .chip.miss { border-color: #fb923c; color: #fb923c; }
+    .feed { display: grid; gap: 1.25rem; }
+    .post { background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+    .post img { width: 100%; display: block; max-height: 420px; object-fit: cover; }
+    .post .body { padding: 1rem; }
+    .post .caption { font-size: 0.95rem; line-height: 1.5; color: #e2e8f0; margin-bottom: 0.6rem; }
+    .post .meta-row { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .post .author { font-weight: 600; font-size: 0.8rem; color: #f97316; }
+    .empty { text-align: center; color: #475569; padding: 3rem; }
+    footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #1e293b;
+             text-align: center; font-size: 0.75rem; color: #334155; }
+    footer span { margin: 0 0.4rem; }
+    footer a { color: #475569; text-decoration: none; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📸 Saudi Snaps</h1>
-    <p>Share your moments from the Kingdom</p>
-    <p style="margin-top:1rem">
-      <a href="/api/health" style="color:#f97316">Check edge location →</a>
-    </p>
+<div class="wrap">
+  <header>
+    <div class="logo">📸 Saudi Snaps</div>
+    <div class="tagline">Share your moments from the Kingdom</div>
+  </header>
+  <div class="stats-bar">
+    <div class="stat"><div class="val" id="s-posts">—</div><div class="lbl">Total Snaps</div></div>
+    <div class="stat"><div class="val" id="s-countries">—</div><div class="lbl">Countries</div></div>
+    <div class="stat"><div class="val" id="s-ai-ms">—</div><div class="lbl">Avg AI Latency</div></div>
+    <div class="stat"><div class="val" id="s-cache">—</div><div class="lbl">Cache Hit Rate</div></div>
   </div>
+  <div class="uploader">
+    <h2>Share a Snap</h2>
+    <input type="text" id="author" placeholder="Your name" />
+    <input type="file" id="photo" accept="image/*" />
+    <button class="post-btn" id="btn" onclick="upload()">Post Snap</button>
+    <div class="result" id="result">
+      <div class="caption-text" id="result-caption"></div>
+      <div class="metrics" id="result-metrics"></div>
+    </div>
+  </div>
+  <div class="feed" id="feed"><div class="empty">Loading snaps...</div></div>
+  <footer>
+    <span>Built on</span>
+    <span>⚡ <a href="https://developers.cloudflare.com/workers/" target="_blank">Workers</a></span> ·
+    <span>🗄️ <a href="https://developers.cloudflare.com/d1/" target="_blank">D1</a></span> ·
+    <span>🪣 <a href="https://developers.cloudflare.com/r2/" target="_blank">R2</a></span> ·
+    <span>🔑 <a href="https://developers.cloudflare.com/kv/" target="_blank">KV</a></span> ·
+    <span>🤖 <a href="https://developers.cloudflare.com/workers-ai/" target="_blank">Workers AI</a></span> ·
+    <span>🔀 <a href="https://developers.cloudflare.com/ai-gateway/" target="_blank">AI Gateway</a></span>
+  </footer>
+</div>
+<script>
+  function flag(code) {
+    if (!code || code.length !== 2) return "🌍";
+    return String.fromCodePoint(...code.toUpperCase().split("").map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+  }
+  async function loadStats() {
+    try {
+      const r = await fetch("/api/stats"); const d = await r.json();
+      document.getElementById("s-posts").textContent     = d.total_posts ?? "—";
+      document.getElementById("s-countries").textContent = d.total_countries ?? "—";
+      document.getElementById("s-ai-ms").textContent     = d.avg_caption_ms ? d.avg_caption_ms + "ms" : "—";
+      document.getElementById("s-cache").textContent     = d.cache_hit_rate ?? "—";
+    } catch {}
+  }
+  async function loadFeed() {
+    try {
+      const r = await fetch("/api/posts"); const { posts } = await r.json();
+      const feed = document.getElementById("feed");
+      if (!posts.length) { feed.innerHTML = '<div class="empty">No snaps yet — be the first!</div>'; return; }
+      feed.innerHTML = posts.map(p => {
+        const f = flag(p.country);
+        const loc = [p.city, p.country].filter(Boolean).join(", ");
+        const chips = [
+          loc    ? `<span class="chip">${f} ${loc}</span>` : "",
+          p.colo ? `<span class="chip">🌐 ${p.colo}</span>` : "",
+          p.r2_ms != null ? `<span class="chip">⬆️ R2 ${p.r2_ms}ms</span>` : "",
+          p.ai_ms != null ? (p.cached
+            ? `<span class="chip hit">⚡ CACHE HIT ${p.ai_ms}ms</span>`
+            : `<span class="chip miss">🤖 AI ${p.ai_ms}ms</span>`) : "",
+        ].filter(Boolean).join("");
+        return `<div class="post">
+          <img src="/api/photo/${encodeURIComponent(p.photo_key)}" alt="snap" loading="lazy" />
+          <div class="body">
+            <div class="caption">${p.caption || '<em style="color:#475569">No caption</em>'}</div>
+            <div class="meta-row"><span class="author">— ${p.author}</span>${chips}</div>
+          </div></div>`;
+      }).join("");
+    } catch {}
+  }
+  async function upload() {
+    const photo = document.getElementById("photo").files[0];
+    const author = document.getElementById("author").value.trim() || "Guest";
+    if (!photo) { alert("Pick a photo first"); return; }
+    const btn = document.getElementById("btn");
+    btn.disabled = true; btn.textContent = "Posting...";
+    try {
+      const fd = new FormData(); fd.append("photo", photo); fd.append("author", author);
+      const res = await fetch("/api/posts", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "Upload failed"); return; }
+      const m = data.meta || {};
+      document.getElementById("result").style.display = "block";
+      document.getElementById("result-caption").textContent = data.caption || "No caption generated";
+      const cacheChip = m.cached
+        ? `<span class="chip hit">⚡ AI Gateway CACHE HIT — ${m.ai_ms}ms</span>`
+        : `<span class="chip miss">🔥 AI Gateway CACHE MISS — ${m.ai_ms}ms</span>`;
+      document.getElementById("result-metrics").innerHTML = [
+        m.city||m.country ? `<span class="chip highlight">${m.flag||"🌍"} Uploaded from ${[m.city,m.country].filter(Boolean).join(", ")}</span>` : "",
+        m.colo ? `<span class="chip highlight">🌐 Edge: ${m.colo}</span>` : "",
+        m.r2_ms != null ? `<span class="chip">⬆️ R2 in ${m.r2_ms}ms</span>` : "",
+        m.ai_ms != null ? cacheChip : "",
+      ].filter(Boolean).join("");
+      document.getElementById("photo").value = "";
+      await loadFeed(); await loadStats();
+    } finally { btn.disabled = false; btn.textContent = "Post Snap"; }
+  }
+  loadFeed(); loadStats();
+</script>
 </body>
 </html>
