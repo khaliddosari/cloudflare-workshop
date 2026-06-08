@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "saudi-snaps",
+  "main": "src/index.js",
+  "compatibility_date": "2026-05-30",
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./public/",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "workshop_kv",
+      "id": "06e75245c96f47a2860774d16170bc8f"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "cloudflare_workshop",
+      "database_name": "cloudflare-workshop",
+      "database_id": "565e033c-9538-42c7-9690-88efc6974162"
+    }
+  ]
+}

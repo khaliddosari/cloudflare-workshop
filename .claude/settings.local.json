@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:cloudflare-tuwaiq.atozlabs.workers.dev)",
+      "Bash(Get-ChildItem -Recurse -Filter \"wrangler*\" \"C:\\\\Users\\\\khali\\\\Downloads\\\\Coding Projects\\\\cloudflare-workshop\")"
+    ]
+  }
+}
